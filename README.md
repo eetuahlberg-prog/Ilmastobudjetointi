@@ -204,3 +204,4 @@ Pääväri on tehtävänannossa annettu `#E4003A`; pohja on valkoinen ja teksti 
 Erillistä brändiohjetiedostoa tai virallista logoa ei ollut liitteissä. Lisävärien sävyt ja PK-tekstimerkki ovat tämän käyttöliittymän ratkaisuja, eivät väite virallisen brändiohjeen tarkoista sävyistä tai tunnuksesta. Maisemakuva on käyttäjän toimittama. Muut neljä liitekuvaa tarkastettiin; niitä ei tarvita tämän datatyökalun toimintaan.
 
 Työkalu on paikallisesti tallentava yhden käyttäjän työväline. Siinä ei ole käyttäjätunnuksia, käyttöoikeushallintaa tai samanaikaisten muokkausten yhdistämistä. Tiedostotuonti tukee tarkastettua ALas-rakennetta ja 13 tunnettua sektoria; jos Syke muuttaa tiedostorakennetta, parseri voidaan päivittää ilman käyttöliittymän uudelleenrakentamista.
+Päivitetty 15.9.2026.
