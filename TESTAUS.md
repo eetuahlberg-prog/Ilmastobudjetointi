@@ -1,10 +1,28 @@
-# Korjausversion 1.1 tarkistus 12.10.2026
+# Korjausversion 1.1 tarkistus – 12.10.2026
 
-- 14 automaattitestiä läpäisty. Liikennevalot kattavat alituksen, tasan tavoitteen, hyvin pienen ylityksen, 3 %, tasan 5 %, yli 5 %, desimaalilukujen 5 % rajan sekä nollan ja puuttuvan tavoitteen.
-- Käyttäjän esimerkit 103000/100000 ja 105000/100000 ovat keltaisia, 105001/100000 punainen.
-- 56 näkymän ja 14 sektori-ikkunan muodostuminen tarkistettu DOM-korvikkeella. Vuoden vaihtaminen 2029:ään päivittyy päästötaulukkoon ja raporttiin. Keltainen tila näkyy renderöidyssä yhteenvedossa ja Excelin vientiaineistossa.
-- Alkuperäiset laskenta-, tuonti- ja vientimoduulit sekä päästöaineistot ovat tavutasolla ennallaan edelliseen julkaisuun verrattuna.
-- Molempien logojen tiedostot vastaavat lähdetiedostoja. Ilmastovisio-logon ruututausta on osa alkuperäistä kuvaa. EU-tunnuksen valkoiselle versiolle on tumma pohja.
-- Logojen, rahoituslausekkeen ja version tulostusnäkyvyys on määritelty tulostustyyleihin. Käyttöohje ja vuosivalitsin piilotetaan tulosteesta, valittu vuosi näkyy raportin otsikossa.
+## Automaattitestit
 
-Rajoitus: oikean selaimen visuaalista testiä ja PDF:n sivutuksen tarkistusta ei voitu tehdä tässä ympäristössä. Selaimen asentamiseen tarvittava lataus ei onnistunut. Tulostuksessa käytä A4 vaaka ja salli taustagrafiikat. GitHub-julkaisua ei ole tehty.
+`npm test`: 22 testiä läpäisty.
+
+- Alkuperäiset 14 laskenta-, validointi-, maakunta- ja liikennevalotestiä.
+- Oman kunnan omat lähtötiedot ja tavoitteet, varmuuskopion validointi sekä erillisyys maakuntasummasta.
+- Puuttuvien ja virheellisten lähtötietojen hylkääminen.
+- Excel-tuonnin kumoaminen, muiden kuntien ja myöhemmin muutettujen tavoiteasetusten säilyttäminen.
+- Oman kunnan ensimmäisen lisäyksen ja myöhemmän tietovuoden kumoaminen.
+- Jokaisen 13 sektorin rajat 95, 100, 100,1, 103, 105, 105,1 ja 110 tavoitteen ollessa 100; myös sektorikohtaisesti muutetut tavoiteurat.
+- 14 alueen kaikki neljä näkymää ja sektori-ikkunat muodostuvat DOM-korvikkeella.
+- Sanalliset sektoriluokitukset sekä taulukossa, sektori-ikkunassa että Excelin vientiriveillä. Sektoritavoitteiden asetuksissa keltainen tila käyttää samaa luokittelua.
+- Oman kunnan lomakkeen tapahtumankäsittely, puuttuvan luvun hylkäys, talousarviovuoden vaihto, raportin nimi, vuosipäivitys ja paikallinen tallennus.
+- Tuonnin hyväksymisen ja kumoamisen käyttöliittymälogiikka.
+
+## Säilytetyt tiedostot ja tunnukset
+
+Alkuperäiseen ZIP-pakettiin verrattuna `data/dataset.json`, `data/source-audit.json`, `src/core.js`, `src/importer.js`, `src/exports.js` ja vendor-kirjasto ovat tavutasolla muuttumattomat. Logot on kopioitu sopeutumistyökalujen käytössä olevista tiedostoista; niiden mittasuhteita tai värejä ei muokattu. Ilmastovisio-tiedostossa on aito alpha-läpinäkyvyys.
+
+## Tulostus ja tarkistuksen rajaus
+
+Tulostustyyleissä ovat punainen otsake, EU-tunnus, Ilmastovisio-logo, rahoituslauseke, versionumero ja valittu talousarviovuosi. Liikennevalojen värin rinnalla tulostuu sanallinen tulos. Ohjauspainikkeet ja syöttölomakkeet piilotetaan tulosteesta.
+
+**Oikean selaimen visuaalista tarkistusta ja PDF:n sivutuksen varmistusta ei voitu tehdä:** Chromiumin lataus epäonnistui. DOM-korvike tarkistaa muodostuvan sisällön ja tapahtumien logiikan, mutta ei CSS-asettelua, selaimen lomakevalidointia, latausikkunoita tai PDF-renderöintiä. GitHub-julkaisua ei tehty.
+
+Ennen julkista käyttöönottoa tarkista selaimessa työpöytä- ja mobiilinäkymä sekä yksi A4-vaakatuloste: tunnusten luettavuus, sektoritaulukon mahtuminen sivulle, kolmen värin ja sanallisten luokitusten näkyminen. Valitse taustagrafiikat ja poista selaimen omat ylä- ja alatunnisteet.
