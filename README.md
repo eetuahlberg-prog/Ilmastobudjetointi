@@ -1,5 +1,16 @@
 # Pohjois-Karjalan kuntien ilmastobudjetti
 
+## Korjausversio 1.1
+
+Lisätty Ilmastovisio-logo, virallinen EU:n valkoinen rahoitustunnus tummalla pohjalla, JTF-rahoituslauseke ja versionumero myös tulostukseen. Alkuun on lisätty todellisia toimintoja vastaava avattava käyttöohje sekä näkyvä Talousarviovuosi-valinta.
+
+Liikennevalo käyttää tarkkaa saman vuoden toteuman ja tavoiteuran suhteellista erotusta. Vanha absoluuttinen toleranssi on poistettu. Kaikki positiiviset ylitykset ovat keltaisia 5 prosenttiin asti, suuremmat punaisia; tavoiteuralla tai alapuolella oleva toteuma on vihreä. Pallojen reuna on valkoinen. Kuntien päästöbudjetin laskentakaavoja ei muutettu.
+
+**Päivitys GitHubiin:** korvaa paketin tiedostot nykyisten vastaavilla paikoilla. Mukaan tarvitaan myös molemmat uudet kuvat assets-kansiosta. Säilytä oma data/dataset.json, jos olet päivittänyt sitä.
+
+**Logo:** Ilmastovisio-kuva on alkuperäinen tiedosto, jonka ruututausta kuuluu kuvaan. Kuvan värejä tai mittasuhteita ei ole muutettu. EU-tunnus on valkoinen negatiiviversio; sen tumma tausta kuuluu esitystapaan. Tulostuksessa salli taustagrafiikat.
+
+
 Valmis selainpohjainen työkalu 13 kunnalle: toteutuneet päästöt, lineaarinen päästöbudjetti, sektorikohtaiset tavoitteet ja tulostettava raportti. Kaikkien kuntien päästötiedot ovat mukana. Työkalu toimii GitHub Pagesissa ilman palvelinta, tietokantaa, kirjautumista tai maksullista palvelua.
 
 ## Päivitä nykyinen GitHub-sivusto
@@ -18,7 +29,7 @@ Aloitusvalinta on **Pohjois-Karjala · maakunta**. Valitse kunta samasta valikos
 
 Tavoiteura esitetään kuntien tavoitejaksojen yhteisiltä vuosilta. Puuttuvia kuntavuosia ei tulkita nollaksi: maakunnan toteuma näytetään vain vuosilta, joilta kaikki kuntatiedot löytyvät. Aineiston tai kuntatavoitteiden päivitys päivittyy automaattisesti maakuntanäkymään.
 
-Liikennevalot vertaavat aina toteumaa saman vuoden tavoiteuraan. Yksi yhteinen selite kertoo merkitykset; yksittäisissä valoissa on ruudunlukijan nimi ja hiiren osoittimella näkyvä otsake. Vihreä kattaa tavoiteuran ja sen alituksen sekä enintään 0,05 kt CO₂e:n ylityksen. Keltainen tarkoittaa tätä suurempaa, mutta enintään 5 %:n ylitystä. Punainen tarkoittaa suurempaa ylitystä. Nollatavoitteella yli 0,05 kt ylitys on punainen. Puuttuva vertailu on harmaa. Nämä ovat työkalun teknisiä luokittelurajoja, eivät kunnan päätettyjä tavoitteita. Raja-arvot ovat yhdessä paikassa: **src/additions.js → TRAFFIC_LIMITS**.
+Liikennevalot vertaavat aina toteumaa saman vuoden tavoiteuraan. Yksi yhteinen selite kertoo merkitykset; yksittäisissä valoissa on ruudunlukijan nimi ja hiiren osoittimella näkyvä otsake. Vihreä kattaa tavoiteuran ja sen alituksen. Keltainen tarkoittaa yli 0 %:n ja enintään 5 %:n ylitystä. Punainen tarkoittaa suurempaa ylitystä. Nollatavoitteella jokainen positiivinen toteuma on punainen. Puuttuva vertailu on harmaa. Nämä ovat työkalun teknisiä luokittelurajoja, eivät kunnan päätettyjä tavoitteita. Raja-arvot ovat yhdessä paikassa: **src/additions.js → TRAFFIC_LIMITS**.
 
 Lataa vain tarvitsemasi aineisto näkymän painikkeista:
 
@@ -117,7 +128,7 @@ budjetti(vuosi) = lähtötaso × [1 − (vähennysprosentti / 100)
                              × (vuosi − lähtövuosi) / (tavoitevuosi − lähtövuosi)]
 ```
 
-Kaava koskee lähtövuoden ja tavoitevuoden välistä aikaa. Aikavälin ulkopuolelle ei keksitä tavoitearvoja. Toteuma ja tavoiteura ovat eri tietoja. Ero tavoiteuraan lasketaan aina **samalta vuodelta**, viimeisimmän toteuman ja vastaavan tavoitevuosiarvon väliltä. Positiivinen ero tarkoittaa ylitystä. Alle 0,05 kt:n poikkeama esitetään tavoiteuralla, koska lähteen tarkkuus on 0,1 kt. Väriä täydentää aina teksti.
+Kaava koskee lähtövuoden ja tavoitevuoden välistä aikaa. Aikavälin ulkopuolelle ei keksitä tavoitearvoja. Toteuma ja tavoiteura ovat eri tietoja. Ero tavoiteuraan lasketaan aina **samalta vuodelta**, viimeisimmän toteuman ja vastaavan tavoitevuosiarvon väliltä. Positiivinen ero tarkoittaa ylitystä. Liikennevalo määräytyy tarkasta suhteellisesta ylityksestä: enintään 0 % vihreä, yli 0–5 % keltainen ja yli 5 % punainen. Värien merkitys kerrotaan yhteisessä selitteessä ja saavutettavissa nimissä.
 
 Automaattisessa tilassa sama vähennysprosentti koskee kaikkia sektoreita. Sektorikohtaisessa tilassa käyttäjä voi muuttaa prosentit erikseen. Tällöin kokonaisbudjetti muodostuu sektoreista, ja työkalu näyttää eron yleiseen vähennystavoitteeseen: erisuuruisia prosentteja ei hiljaisesti pakoteta täsmäämään yleiseen tavoitteeseen.
 

@@ -1,14 +1,17 @@
 import {budget,sectorBudget,roundingBudget,finite,METHOD} from './core.js';
 export const REGION_ID='pohjois-karjala';
 export const SECTOR_COLORS=Object.freeze({'Kulutussähkö':'#FFDF43','Sähkölämmitys':'#F48C24','Kaukolämpö':'#FF0505','Öljylämmitys':'#F7A979','Muu lämmitys':'#FFC000','Teollisuus':'#595959','Työkoneet':'#4951ED','Tieliikenne':'#8EDDFF','Raideliikenne':'#7F7F7F','Vesiliikenne':'#FFF2CC','Maatalous':'#548235','Jätteiden käsittely':'#C5E0B4','F-kaasut':'#9DC3E6'});
-// Absolute tolerance follows the existing display precision. Yellow: at most 5% above target.
-export const TRAFFIC_LIMITS=Object.freeze({absoluteToleranceKt:0.05,nearPercent:5});
+// Central display-status threshold. Municipal emissions calculations are unchanged.
+export const TRAFFIC_LIMITS=Object.freeze({nearPercent:5});
 export function traffic(actual,target){
- if(!finite(actual)||!finite(target))return {color:'unknown',label:'Vertailua ei saatavilla'};
+ if(!finite(actual)||!finite(target)||target<0||actual<0)return {color:'unknown',label:'Vertailua ei saatavilla',percent:null};
  const gap=actual-target;
- if(gap<=TRAFFIC_LIMITS.absoluteToleranceKt)return {color:'green',label:'Tavoiteuralla'};
- if(target>0&&gap/target*100<=TRAFFIC_LIMITS.nearPercent)return {color:'yellow',label:'Lähellä tavoiteuraa'};
- return {color:'red',label:'Tavoiteuran yläpuolella'};
+ if(target===0)return gap<=0?{color:'green',label:'Tavoiteuralla',percent:null}:{color:'red',label:'Tavoiteuran yläpuolella',percent:null};
+ const percent=gap/target*100;
+ if(percent<=0)return {color:'green',label:'Tavoiteuralla',percent};
+ // Equivalent limit comparison avoids subtraction noise at exactly 5%, without rounding values.
+ if(actual<=target*(1+TRAFFIC_LIMITS.nearPercent/100))return {color:'yellow',label:'Lähellä tavoiteuraa',percent};
+ return {color:'red',label:'Tavoiteuran yläpuolella',percent};
 }
 const completeSum=values=>values.every(finite)?values.reduce((a,b)=>a+b,0):null;
 export const totalBudget=(c,y)=>c.members?completeSum(c.members.map(x=>budget(x,y))):budget(c,y);
