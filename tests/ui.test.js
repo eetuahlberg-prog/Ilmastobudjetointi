@@ -31,15 +31,20 @@ test('All municipality pages, dialogs and every sector boundary render with verb
  h.run(`config().reduction=65;for(const s of muni().sectors)config().sectorTargets[s]=64;`);assert.match(h.run('settingsSummary()'),/traffic yellow/);
  h.run(`current=data.municipalities[0].id;config().reduction=0;for(const s of muni().sectors)config().sectorTargets[s]=0;config().baseline.sectors[muni().sectors[0]]=100;`);
 });
-test('Muu kunta input, validation, year addition, undo, and year switching follow UI handlers',()=>{
- const h=harness();h.emit('change',{id:'municipality',value:'muu-kunta'});assert.match(h.element('main').innerHTML,/Muun kunnan lähtötiedot/);assert.doesNotMatch(h.element('main').innerHTML,/traffic green/);assert.equal(h.element('undo-addition').disabled,true);
- const values={name:'Testikunta',source:'Testiaineisto','custom-base':'2007','custom-latest':'2024','custom-target':'2030','custom-reduction':'50'};
- for(let i=0;i<13;i++){values['base-'+i]='100';values['latest-'+i]='80';}values['base-13']='1300';values['latest-13']='1040';
- const missing={...values,'base-0':''};h.emit('submit',{id:'custom-create',values:missing});assert.match(h.element('custom-error').textContent,/Täytä/);assert.equal(h.run('data.otherMunicipality'),undefined);
- h.emit('submit',{id:'custom-create',values});assert.equal(h.run('muni().name'),'Testikunta');assert.equal(h.run('budget(config(),2030)'),650);assert.equal(h.element('undo-addition').disabled,false);
- h.emit('change',{id:'budget-year',value:'2029'});h.run("location.hash='#raportti';render()");assert.match(h.element('main').innerHTML,/Testikunta/);assert.match(h.element('main').innerHTML,/2029/);assert.doesNotMatch(h.element('main').innerHTML,/Testikunta · Pohjois-Karjala/);
- const added={source:'Testiaineisto 2025','observation-year':'2025','value-13':'910'};for(let i=0;i<13;i++)added['value-'+i]='70';h.emit('submit',{id:'custom-year-form',values:added});assert.deepEqual(Array.from(h.run('muni().years')),[2007,2024,2025]);
- h.run("undoAddition(data,undo);undo=null;save();render()");assert.deepEqual(Array.from(h.run('muni().years')),[2007,2024]);assert.equal(h.element('undo-addition').disabled,true);assert.equal(JSON.parse(h.ctx.localStorage.value).data.otherMunicipality.name,'Testikunta');
+test('Muu kunta Excel preview, target validation, update, replacement and undo follow UI handlers',async()=>{
+ const h=harness();h.emit('change',{id:'municipality',value:'muu-kunta'});assert.match(h.element('main').innerHTML,/Excelistä/);assert.doesNotMatch(h.element('main').innerHTML,/custom-create/);assert.equal(h.element('undo-addition').disabled,true);
+ const original=structuredClone(h.run('data.municipalities[0]'));original.id='muu-kunta';original.name='Tampere';original.metadata.importedMunicipalityName='Tampere';h.ctx.file={name:'Tampere.xlsx',municipality:original};
+ await h.run('importCustomFiles([file])');assert.match(h.element('custom-import-preview').innerHTML,/Tampere/);assert.equal(h.run('data.otherMunicipality'),undefined);
+ h.element('import-base-year').value='2007';h.element('accept-custom-import').onclick();assert.match(h.element('custom-import-error').textContent,/Anna kunnan/);
+ h.element('import-target-year').value='2035';h.element('import-reduction').value='70';h.element('accept-custom-import').onclick();assert.equal(h.run('muni().name'),'Tampere');assert.equal(h.run('config().reduction'),70);assert.equal(h.element('undo-addition').disabled,false);
+ const source=h.run('config().baseline.sourceFile');h.run("config().confirmed=true;config().mode='sectors';config().sectorTargets.Tieliikenne=80;location.hash='#asetukset';render()");
+ const updated=structuredClone(original);updated.years.push(2025);updated.observations[2025]=structuredClone(updated.observations[2024]);updated.metadata.fileName='Tampere-2025.xlsx';h.ctx.file={name:'Tampere-2025.xlsx',municipality:updated};
+ await h.run('importCustomFiles([file])');h.element('accept-custom-import').onclick();assert.equal(h.run('latest()'),2025);assert.equal(h.run('config().baseline.sourceFile'),source);assert.equal(h.run('config().confirmed'),true);assert.equal(h.run('config().sectorTargets.Tieliikenne'),80);
+ h.emit('change',{id:'budget-year',value:'2029'});h.run("location.hash='#raportti';render()");assert.match(h.element('main').innerHTML,/Tampere/);assert.match(h.element('main').innerHTML,/2029/);
+ h.run('undoAddition(data,undo);undo=null;save();render()');assert.equal(h.run('latest()'),2024);
+ const another=structuredClone(original);another.name='Lahti';another.metadata.importedMunicipalityName='Lahti';h.ctx.file={name:'Lahti.xlsx',municipality:another};h.run("location.hash='#asetukset';render()");
+ await h.run('importCustomFiles([file])');assert.match(h.element('custom-import-preview').innerHTML,/korvaa oman kunnan Tampere/);h.element('import-base-year').value='2007';h.element('import-target-year').value='2030';h.element('import-reduction').value='60';h.element('accept-custom-import').onclick();assert.equal(h.run('muni().name'),'Lahti');assert.equal(h.run('config().reduction'),60);
+ h.run('undoAddition(data,undo);undo=null;save();render()');assert.equal(h.run('muni().name'),'Tampere');assert.equal(h.run('config().sectorTargets.Tieliikenne'),80);
 });
 test('Import accept and undo restore emissions while retaining separately edited target settings',async()=>{
  const h=harness();h.run("location.hash='#asetukset';render()");const m=structuredClone(h.run('data.municipalities[0]'));m.metadata.source='Tuotu aineisto';h.ctx.file={name:'test.xlsx',municipality:m};await h.run('importFiles([file])');h.element('accept-import').onclick();assert.equal(h.run('data.municipalities[0].metadata.source'),'Tuotu aineisto');h.run('data.configs[data.municipalities[0].id].reduction=70');

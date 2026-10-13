@@ -30,30 +30,27 @@ Muutokset tallentuvat vain tämän selaimen paikalliseen tallennukseen. Ne eivä
 
 ## Muu kunta
 
-Valitse aluevalikon viimeinen vaihtoehto **Muu kunta** ja anna kunnan nimi. Ennen laskelmien näyttämistä tarvitaan:
+Valitse aluevalikon viimeinen vaihtoehto **Muu kunta** ja lisää haluamasi kunnan **Hinku-laskenta ilman hyvityksiä** -Excel (`.xlsx`) Syken päästöpalvelusta. Tiedoston voi valita painikkeesta tai pudottaa tuontialueelle. Päästölukuja tai kunnan nimeä ei tarvitse syöttää käsin.
 
-- tietojen lähde;
-- lähtövuosi ja sitä myöhempi toteumavuosi;
-- molemmilta vuosilta kaikki 13 päästösektoria sekä lähteen kokonaispäästöt;
-- kunnan oma tavoitevuosi ja päästövähennysprosentti.
+Työkalu lukee `KHK-päästöt`-välilehdeltä kunnan nimen, kaikki tietovuodet, 13 sektoria ja kokonaispäästöt. Sama tietojen tarkistus koskee kaikkia kuntia. Aineiston on oltava yksikössä kt CO₂e ja ilman päästöhyvityksiä. Virheellinen tai puutteellinen tiedosto ei muuta tallennettua aineistoa.
 
-Yksikkö on **kt CO₂e**: 1 kt = 1 000 tonnia. Käytä molempina vuosina samaa Hinku-laskentaa ilman päästöhyvityksiä. Tyhjää kenttää ei tulkita nollaksi. Anna 0 vain todellisen nollapäästön kohdalle. Kokonaispäästöjen ja sektorisumman sallittu ero on enintään 0,75 kt, kuten alkuperäisessä aineistovalidoinnissa; sillä huomioidaan lähteen pyöristys.
+Tuonnin esikatselu näyttää kunnan, aikavälin, sektorien määrän ja viimeisimmät kokonaispäästöt. Ensimmäisellä tuonnilla valitse lähtövuosi ja anna kunnan tavoitevuosi sekä vähennysprosentti. Excel sisältää toteumat, joten kunnan tavoitetta ei päätellä tiedostosta. Hyväksy painikkeella **Ota Excel-aineisto käyttöön**. Tavoitteita voi muuttaa myöhemmin asetuksista.
 
-Tiedot ja tavoite tarkistetaan ennen tallennusta. Puutteellisista lähtötiedoista ei muodosteta laskelmaa tai liikennevaloa. Kunnan nimeä voi muuttaa yläosan kentässä, ja se päivittyy raporttiin ja vienteihin.
+Saman kunnan uusi Excel tuodaan **Asetukset ja aineisto** -näkymässä. Koko aikasarja päivittyy hyväksymisen jälkeen. Aiemmat tavoiteasetukset ja tavoiteuran tallennettu lähtötaso säilyvät. Aiempia tietovuosia ei saa puuttua uudesta tiedostosta. Lähtötason voi tarvittaessa päivittää erikseen asetuksissa.
 
-Tallennuksen jälkeen tavoitteita muokataan samoista asetuksista kuin muidenkin kuntien tavoitteita. **Lisää tai päivitä tietovuosi** -painikkeella voi syöttää uuden vuoden tai korjata aiempaa vuotta. Nykyisen vuoden valitseminen täyttää sen päästöluvut lomakkeelle. Tallennus säilyttää muut vuodet ja tavoiteuran lähtötason. Tarvittaessa lähtötaso päivitetään erikseen asetuksista.
+Työkalussa on yksi oman kunnan tietopaikka. Jos Excel koskee eri kuntaa, esikatselu kertoo aiemman kunnan tietojen korvaamisesta ja pyytää uuden kunnan tavoitteet. Vaihto tapahtuu vasta **Korvaa oma kunta tällä aineistolla** -painikkeesta. Sen voi kumota, jolloin edellinen kunta ja sen tavoitteet palautuvat.
 
-Työkalussa on yksi oman kunnan tietopaikka. Sen tiedot tallentuvat selaimeen ja koko aineiston varmuuskopioon. Niitä ei liitetä Pohjois-Karjalan maakunnan summaan. Muun kunnan tiedot syötetään tässä versiossa käsin; ALas-Excelin tuonti tukee mukana olevia 13 Pohjois-Karjalan kuntaa.
+Oman kunnan tiedot tallentuvat selaimeen ja JSON-varmuuskopioon. Niitä ei liitetä Pohjois-Karjalan maakunnan summaan. Myös edellisessä versiossa käsin syötetyt tiedot voidaan avata ja päivittää Excelistä. Excelistä luettu alkuperäinen kuntanimi säilytetään päivitysten tunnistamista varten, vaikka raportissa näkyvää nimeä muokataan.
 
 ## Kumoa viimeisin lisäys
 
 Painike peruu viimeisimmän hyväksytyn päästötietojen lisäyksen:
 
 - Pohjois-Karjalan kunnan tai usean kunnan Excel-tuonnin;
-- oman kunnan ensimmäisen tietolisäyksen;
-- oman kunnan tietovuoden lisäämisen tai päivittämisen.
+- oman kunnan ensimmäisen Excel-tuonnin;
+- saman kunnan Excel-päivityksen tai vaihtamisen toiseen kuntaan.
 
-Painikkeen vieressä kerrotaan, mitä on kumottavissa. Vahvistuksen jälkeen aiemmat päästötiedot palautuvat ja laskelmat päivittyvät. Excel-erän kumoaminen koskee vain kyseisessä erässä tuotuja kuntia. Erikseen tehdyt tavoiteasetusten muutokset säilyvät. Oman kunnan ensimmäisen lisäyksen kumoaminen poistaa kyseisen oman kunnan tiedot ja niihin sidotut tavoitteet.
+Painikkeen vieressä kerrotaan, mitä on kumottavissa. Vahvistuksen jälkeen aiemmat päästötiedot palautuvat ja laskelmat päivittyvät. Excel-erän kumoaminen koskee vain kyseisessä erässä tuotuja kuntia. Erikseen tehdyt tavoiteasetusten muutokset säilyvät. Oman kunnan ensimmäisen tuonnin kumoaminen poistaa sen tiedot ja tavoitteet. Eri kuntaan vaihtamisen kumoaminen palauttaa edellisen kunnan tiedot ja tavoitteet. Saman kunnan päivityksen kumoaminen säilyttää erikseen tehdyt tavoitemuutokset.
 
 Muistissa on yksi kumottava lisäys. Sen tiedot säilyvät tässä selaimessa myös sivun latauksen yli. Kumoamisen jälkeen painike poistuu käytöstä. Varmuuskopion palauttaminen ja julkaistun aineiston käyttöönotto tyhjentävät kumoamismuistin; ne ovat koko aineiston vaihtoja, eivät tämän painikkeen kumottavia lisäyksiä. JSON-varmuuskopio ei sisällä kumoamishistoriaa.
 
@@ -95,7 +92,7 @@ Lähde on Suomen ympäristökeskuksen [kuntien ja alueiden päästöpalvelu](htt
 
 Excel-tuonti lukee `KHK-päästöt`-välilehden: kunnan, vuodet, 13 päästösektoria, kokonaispäästöt, hyvitysrivin sekä mahdolliset asukas- ja asukaskohtaiset tiedot. Se tunnistaa rivit nimillä. Väärä laskentamenetelmä, puuttuvat arvot, päästötaulukon kaavat, ristiriitaiset summat ja puuttuvat vanhat vuodet estävät tuonnin hyväksymisen. Tuonti näyttää vertailun ennen tallennusta.
 
-`data/source-audit.json` on alkuperäisten Excelien tarkastusraportti. Se ei päivity selaimen tietotuonnissa. Oman kunnan tiedoista vastaa niiden syöttäjä.
+`data/source-audit.json` on alkuperäisten Excelien tarkastusraportti. Se ei päivity selaimen tietotuonnissa. Käyttäjä vastaa oikean kunnan ja laskentamenetelmän valitsemisesta lähdepalvelussa.
 
 ## Tekninen toteutus
 
@@ -109,7 +106,7 @@ Sovellus käyttää HTML:ää, CSS:ää ja JavaScript-moduuleja. Erillistä palv
 | `src/app.js` | Käyttöliittymä, raportti, syöttölomakkeet, selaintallennus ja tapahtumat |
 | `src/core.js` | Alkuperäiset kuntalaskennat, perusvalidointi ja CSV |
 | `src/additions.js` | Maakunnan summat, yhteinen liikennevaloluokittelu ja sektorivärit |
-| `src/custom.js` | Oman kunnan lähtötiedot, laajennettu validointi ja yhden lisäyksen kumoaminen |
+| `src/custom.js` | Oman kunnan tietojen validointi, Excel-tuonnin hyväksyntä ja kumoaminen |
 | `src/importer.js` | ALas-Excelin lukeminen ja tuontivertailu |
 | `src/exports.js` | Excel- ja PNG-viennit |
 | `vendor/` | Paikallinen JSZip-kirjasto ja sen lisenssi |

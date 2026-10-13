@@ -1,4 +1,4 @@
-import {OTHER_ID,validateData,makeCustom,importSnapshot,customSnapshot,undoAddition} from './custom.js';
+import {OTHER_ID,validateData,importSnapshot,undoAddition,sameCustomMunicipality,acceptCustomExcel} from './custom.js';
 import {REGION_ID,SECTOR_COLORS,TRAFFIC_LIMITS,traffic,regionView,totalBudget as budget,totalSectorBudget as sectorBudget,totalRoundingBudget as roundingBudget} from './additions.js';
 import {workbook,saveBlob,chartPNG} from './exports.js';
 import {METHOD,clone,finite,defaultConfig,captureBaseline,validateConfig,change,difference,csv} from './core.js';
@@ -10,7 +10,7 @@ const signed=(v,d=1)=>finite(v)?(v>0?'+':'')+num(v,d):'Ei tietoa';
 const options=(list,current,empty)=>`${empty!==undefined?`<option value="">${esc(empty)}</option>`:''}`+list.map(v=>`<option value="${esc(v)}" ${String(v)===String(current)?'selected':''}>${esc(v)}</option>`).join('');
 const STORAGE='pk-ilmastobudjetti-v1';
 let published,data,current=REGION_ID,year=2027,route='yhteenveto',timer,pending=[],pendingBackup=null;
-let region,undo=null;
+let region,undo=null,customImportToken=0;
 const isOther=()=>current===OTHER_ID;
 const isRegion=()=>current===REGION_ID;
 const muni=()=>isRegion()?region.municipality:isOther()?(data.otherMunicipality??{name:'Muu kunta'}):data.municipalities.find(m=>m.id===current);
@@ -67,18 +67,19 @@ function settingsPage(){if(isRegion())return regionalSettings();const m=muni(),c
 function settingsSummary(){const c=config(),t=budget(c,c.targetYear),overall=c.baseline.total*(1-c.reduction/100),state=traffic(t,overall);return `Lähtötaso ${c.baseYear}: <strong>${num(c.baseline.total)} kt CO₂e</strong> &nbsp;→&nbsp; Tavoite ${c.targetYear}: <strong>${num(t)} kt CO₂e</strong><br>Tarvittava vähennys ${num(c.baseline.total-t)} kt CO₂e.${c.mode==='sectors'?`<div class="notice status-notice ${state.color}">Sektoritavoitteiden yhteenlaskettu vähennys: ${num(-change(t,c.baseline.total))} %. Ero yleisen ${num(c.reduction)} % tavoitteen päästötasoon: ${signed(t-overall)} kt CO₂e. ${light(t,overall)}<p>Keltainen: lähellä tavoiteuraa (ylitys enintään 5 %).</p></div>`:''}`;}
 function sectorTargets(){const c=config();return c.mode==='sectors'?`<details open><summary>Sektorikohtaiset vähennykset vuodesta ${c.baseYear} vuoteen ${c.targetYear}</summary>${muni().sectors.map(s=>`<label class="settings-target">${esc(s)} (%)<input type="number" min="0" max="100" step="0.1" data-sector-target="${esc(s)}" value="${c.sectorTargets[s]??c.reduction}"></label>`).join('')}</details>`:'';}
 function render(){
+  customImportToken++;
   region=regionView(data);
   $('#undo-addition').disabled=!undo;
   $('#undo-description').textContent=undo?'Kumottavissa: '+undo.label:'Peruu viimeisimmän päästötietojen lisäyksen tai tuonnin.';
-  $('#custom-name-box').hidden=!isOther();
+  $('#custom-name-box').hidden=!isOther()||!data.otherMunicipality;
   $('#custom-name').value=data.otherMunicipality?.name??$('#custom-name').value;
-  $('#custom-name').required=isOther()&&!data.otherMunicipality;
+  $('#custom-name').required=false;
   route=location.hash.slice(1)||'yhteenveto';if(!['yhteenveto','paastobudjetti','raportti','asetukset'].includes(route))route='yhteenveto';
   document.querySelectorAll('nav a').forEach(a=>{a.classList.toggle('active',a.dataset.page===route);if(a.dataset.page===route)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
-  if(isOther()&&!data.otherMunicipality){$('#main').innerHTML=customForm();document.title='Muu kunta – Ilmastobudjetti';return;}
+  if(isOther()&&!data.otherMunicipality){$('#main').innerHTML=customExcelPanel();wireCustomDrop();document.title='Muu kunta – Ilmastobudjetti';return;}
   $('#main').innerHTML=({yhteenveto:overview,paastobudjetti:budgetPage,raportti:reportPage,asetukset:settingsPage}[route])();
   document.title=`${muni().name} – Ilmastobudjetti ${year}`;
-  if(route==='asetukset'){wireDrop();if(isOther()){$('#drop-zone').closest('section').outerHTML=`<section class="panel"><h2>Oman kunnan päästötiedot</h2><p>Lisää uuden toteumavuoden tiedot tai korjaa aiemman vuoden tiedot. Tallennettu tavoiteura säilyy.</p><button id="edit-custom">Lisää tai päivitä tietovuosi</button></section>`;}}else{const main=$('#main');main.insertAdjacentHTML('afterbegin',exportControls()+trafficLegend());if(isRegion()&&route==='yhteenveto')main.insertAdjacentHTML('beforeend',`<section class="panel"><h2>Sektoreittainen päästöbudjetti</h2>${sectorTable()}</section>`);}
+  if(route==='asetukset'){wireDrop();if(isOther()){$('#drop-zone').closest('section').outerHTML=customExcelPanel();wireCustomDrop();}}else{const main=$('#main');main.insertAdjacentHTML('afterbegin',exportControls()+trafficLegend());if(isRegion()&&route==='yhteenveto')main.insertAdjacentHTML('beforeend',`<section class="panel"><h2>Sektoreittainen päästöbudjetti</h2>${sectorTable()}</section>`);}
 }
 function showDialog(html){$('#dialog-content').innerHTML=html;$('#modal').showModal();}
 function confirmAction(title,text,callback){showDialog(`<h2 id="dialog-title">${esc(title)}</h2><p>${esc(text)}</p><div class="dialog-actions"><button data-close>Peruuta</button><button class="primary" id="confirm-action">Vahvista</button></div>`);$('#confirm-action').onclick=()=>{$('#modal').close();callback();};}
@@ -116,7 +117,6 @@ document.addEventListener('click',e=>{
   if(b.dataset.export)exportCSV(b.dataset.export);
   if(b.hasAttribute('data-download-data'))dataDownload();
   if(b.id==='print-report')printView();
-  if(b.id==='edit-custom')showDialog(customYearForm());
   if(b.id==='undo-addition'&&undo)confirmAction('Kumoa viimeisin lisäys',undo.label+'. Muut päästötiedot ja tavoiteasetukset säilyvät.',()=>{const next=clone(data);undoAddition(next,undo);try{validateData(next,published.municipalities);data=next;undo=null;save();render();toast('Viimeisin lisäys kumottu.');}catch(err){toast(err.message);}});
   if(b.dataset.download)runDownload(b.dataset.download,b).catch(err=>toast('Lataus epäonnistui: '+err.message));
   if(b.id==='reset-baseline')confirmAction('Päivitä tavoiteuran lähtötaso','Tämä laskee myös vanhojen vuosien tavoiteuran uudelleen nykyisen lähtövuoden aineistosta. Varmuuskopioi vanha ura tarvittaessa. Jatketaanko?',()=>{config().baseline=captureBaseline(muni(),config().baseYear);config().confirmed=false;save();render();toast('Tavoiteuran lähtötaso päivitetty.');});
@@ -163,30 +163,37 @@ async function runDownload(kind,button){
 }
 function printView(){const title=document.createElement('div');title.className='print-only export-print-title';title.textContent=`${muni().name} · Ilmastobudjetti ${year}`;$('#main').prepend(title);window.print();title.remove();}
 
-function valueInput(id,label,value='',extra=''){
- return `<label>${label}<input id="${id}" name="${id}" type="number" step="any" min="${id==='custom-base'||id==='custom-latest'||id==='observation-year'?1990:0}" value="${value}" required ${extra}></label>`;
+function customExcelPanel(){return `<section class="panel"><h2>${data.otherMunicipality?'Päivitä oman kunnan päästötiedot':'Muun kunnan päästötiedot Excelistä'}</h2><p>Lataa haluamasi kunnan Excel Syken päästöpalvelusta valinnalla <strong>Hinku-laskenta ilman hyvityksiä</strong>. Kunnan nimi, päästösektorit ja koko aikasarja luetaan tiedostosta. Päästölukuja ei tarvitse syöttää käsin.</p><div id="custom-drop-zone" class="drop"><strong>Pudota kunnan päästö-Excel tähän</strong><p>tai valitse tiedosto (.xlsx)</p><input id="custom-excel-files" type="file" accept=".xlsx" aria-label="Valitse muun kunnan päästö-Excel"></div><div id="custom-import-preview" aria-live="polite"></div></section>`;}
+function wireCustomDrop(){
+ const drop=$('#custom-drop-zone');
+ drop.ondragover=e=>{e.preventDefault();drop.classList.add('drag');};
+ drop.ondragleave=()=>drop.classList.remove('drag');
+ drop.ondrop=e=>{e.preventDefault();drop.classList.remove('drag');importCustomFiles([...e.dataTransfer.files]);};
+ $('#custom-excel-files').onchange=e=>importCustomFiles([...e.target.files]);
 }
-function customForm(){const sectors=published.municipalities[0].sectors;return `<section class="panel"><h2>Muun kunnan lähtötiedot</h2><p>Anna kunnan omat lähtötiedot. Käytä samaa Hinku-laskentaa ilman päästöhyvityksiä molemmilta vuosilta. Yksikkö on <strong>kt CO₂e</strong> (1 kt = 1 000 tonnia). Tyhjä kenttä ei tarkoita nollaa; anna 0 vain, jos päästö on nolla.</p><form id="custom-create"><div class="form-grid"><label>Tietojen lähde<input name="source" required maxlength="500" placeholder="Esimerkiksi Syken päästöpalvelu, latauspäivä"></label>${valueInput('custom-base','Lähtövuosi','','max="'+new Date().getFullYear()+'"')}${valueInput('custom-latest','Viimeisin toteumavuosi','','max="'+new Date().getFullYear()+'"')}${valueInput('custom-target','Tavoitevuosi','','max="2100"')}${valueInput('custom-reduction','Kunnan päästövähennystavoite (%)','','max="100"')}</div><div class="table-wrap"><table><caption>Anna kaikki 13 sektoria sekä lähteen kokonaispäästöt. Kokonaispäästöjen ja sektorisumman ero voi olla enintään 0,75 kt (lähdeaineiston pyöristys).</caption><thead><tr><th>Päästöt, kt CO₂e</th><th>Lähtövuosi</th><th>Viimeisin toteumavuosi</th></tr></thead><tbody>${[...sectors,'Kokonaispäästöt'].map((s,i)=>`<tr><th>${esc(s)}</th><td><input name="base-${i}" aria-label="${esc(s)} lähtövuonna" type="number" min="0" step="any" required></td><td><input name="latest-${i}" aria-label="${esc(s)} viimeisimpänä toteumavuonna" type="number" min="0" step="any" required></td></tr>`).join('')}</tbody></table></div><p id="custom-error" class="error-text" role="alert"></p><button class="primary" type="submit">Tallenna oman kunnan lähtötiedot</button></form></section>`;}
-function customYearForm(){const m=muni();return `<h2 id="dialog-title">Lisää tai päivitä tietovuosi</h2><p>${esc(m.name)} · kt CO₂e · ${METHOD}. Aiemmat vuodet ja tavoiteasetukset säilyvät. Saman vuoden tallennus korvaa kyseisen vuoden päästöt.</p><form id="custom-year-form">${valueInput('observation-year','Tietovuosi','','max="'+new Date().getFullYear()+'"')}<p>Nykyiset tietovuodet: ${m.years.join(', ')}</p><label>Tietojen lähde<input name="source" required maxlength="500" value="${esc(m.metadata.source)}"></label><div class="form-grid">${[...m.sectors,'Kokonaispäästöt'].map((s,i)=>valueInput('value-'+i,esc(s)+' (kt CO₂e)')).join('')}</div><p id="custom-error" role="alert" class="error-text"></p><div class="dialog-actions"><button type="button" data-close>Peruuta</button><button class="primary" type="submit">Tallenna tietovuosi</button></div></form>`;}
-document.addEventListener('submit',e=>{
- if(!['custom-create','custom-year-form'].includes(e.target.id))return;e.preventDefault();
- const form=new FormData(e.target),getNumber=k=>{const v=String(form.get(k)??'').trim();if(!v||!Number.isFinite(Number(v)))throw Error('Täytä kaikki päästölukukentät.');return Number(v);};
+async function importCustomFiles(files){
+ const token=++customImportToken,preview=$('#custom-import-preview');
+ preview.innerHTML='<p>Tarkistetaan Excel-tiedostoa…</p>';
+ if(files.length!==1){preview.textContent='Valitse yksi kunnan päästö-Excel kerrallaan.';return;}
  try{
-  const next=clone(data),sectors=published.municipalities[0].sectors;
-  if(e.target.id==='custom-create'){
-   const record=prefix=>({total:getNumber(prefix+'-13'),sectors:Object.fromEntries(sectors.map((s,i)=>[s,getNumber(prefix+'-'+i)]))});
-   const result=makeCustom({name:form.get('name'),source:form.get('source'),baseYear:getNumber('custom-base'),latestYear:getNumber('custom-latest'),targetYear:getNumber('custom-target'),reduction:getNumber('custom-reduction'),base:record('base'),latest:record('latest'),sectors});
-   next.otherMunicipality=result.municipality;next.otherConfig=result.config;
-  }else{
-   const y=getNumber('observation-year'),m=next.otherMunicipality;
-   m.observations[y]={total:getNumber('value-13'),sectors:Object.fromEntries(sectors.map((s,i)=>[s,getNumber('value-'+i)])),credits:0};
-   m.years=[...new Set([...m.years,y])].sort((a,b)=>a-b);m.metadata.source=String(form.get('source')).trim();m.metadata.importedAt=new Date().toISOString().slice(0,10);
-   if(!m.metadata.source)throw Error('Anna tietojen lähde.');
-  }
-  validateData(next,published.municipalities);undo=customSnapshot(data);data=next;$('#modal').close();save();render();toast('Oman kunnan tiedot tallennettu.');
- }catch(err){$('#custom-error').textContent=err.message;}
-});
-document.addEventListener('change',e=>{
- if(e.target.id!=='observation-year')return;
- const o=muni().observations[Number(e.target.value)];[...muni().sectors,'Kokonaispäästöt'].forEach((s,i)=>{$('#value-'+i).value=o?(i===13?o.total:o.sectors[s]):'';});
-});
+  const m=await parseExcel(files[0],published.municipalities,{allowOther:true});
+  if(token!==customImportToken||!isOther()||$('#custom-import-preview')!==preview)return;
+  const old=data.otherMunicipality,same=sameCustomMunicipality(old,m),cmp=same?compareImport(old,m,data.otherConfig):null;
+  const baseYear=m.years.includes(2007)?2007:m.years[0];
+  preview.innerHTML=`<div class="import-item"><strong>${esc(m.name)}</strong> · ${m.years[0]}–${m.years.at(-1)} · ${m.years.length} tietovuotta · ${m.sectors.length} sektoria<br>${esc(m.metadata.fileName)}<br>Viimeisin kokonaispäästö: ${num(m.observations[m.years.at(-1)].total)} kt CO₂e</div>${cmp?cmp.warnings.map(w=>`<p class="notice warn">${esc(w)}</p>`).join(''):''}${old&&!same?`<p class="notice warn">Tiedosto koskee kuntaa ${esc(m.name)}. Hyväksyminen korvaa oman kunnan ${esc(old.name)} aineiston ja tavoitteet. Voit kumota tämän tuonnin Kumoa viimeisin lisäys -painikkeella.</p>`:''}${same?'<p>Tallennetut tavoiteasetukset ja lähtötaso säilyvät.</p>':`<p>Valitse kunnan tavoiteasetukset. Excel sisältää toteumat, ei kunnan päätettyä päästövähennystavoitetta. Asetuksia voi muuttaa myöhemmin.</p><div class="settings-row"><label>Lähtövuosi<select id="import-base-year">${options(m.years,baseYear)}</select></label><label>Tavoitevuosi<input id="import-target-year" type="number" min="${baseYear+1}" max="2100"></label><label>Päästövähennystavoite (%)<input id="import-reduction" type="number" min="0" max="100" step="any"></label></div>`}<p id="custom-import-error" class="error-text" role="alert"></p>${cmp?.missing.length?'<p>Aineistoa ei muutettu. Tuo koko aiemman aikasarjan sisältävä Excel.</p>':'<button class="primary" id="accept-custom-import">'+(old&&!same?'Korvaa oma kunta tällä aineistolla':'Ota Excel-aineisto käyttöön')+'</button>'}`;
+  if(cmp?.missing.length)return;
+  $('#accept-custom-import').onclick=()=>{
+   if(token!==customImportToken||!isOther())return;
+   try{
+    let c=null;
+    if(!same){
+     const base=Number($('#import-base-year').value),target=$('#import-target-year').value,reduction=$('#import-reduction').value;
+     if(!target.trim()||!reduction.trim())throw Error('Anna kunnan tavoitevuosi ja päästövähennystavoite.');
+     c={baseYear:base,targetYear:Number(target),reduction:Number(reduction),mode:'auto',sectorTargets:{},basis:'direct',confirmed:false,baseline:captureBaseline(m,base)};
+     validateConfig(c);
+    }
+    const result=acceptCustomExcel(data,m,c,published.municipalities);data=result.data;undo=result.undo;save();render();toast('Kunnan Excel-aineisto otettu käyttöön. Tarkista tavoiteasetukset ja raportti.');
+   }catch(err){$('#custom-import-error').textContent=err.message;}
+  };
+ }catch(err){if(token===customImportToken&&$('#custom-import-preview')===preview)preview.innerHTML=`<p class="error-text">${esc(err.message)}</p><p>Aineistoa ei muutettu.</p>`;}
+}

@@ -1,4 +1,5 @@
 import {METHOD, validateMunicipality} from './core.js';
+import {OTHER_ID} from './custom.js';
 const elements=(node,name)=>Array.from(node.getElementsByTagNameNS('*',name));
 function xml(text) {
   const doc=new DOMParser().parseFromString(text,'application/xml');
@@ -10,7 +11,7 @@ async function part(zip,path,optional=false) {
   const text=await f.async('string');if(text.length>15000000)throw Error('Excelin taulukko on liian suuri.');return xml(text);
 }
 function column(ref) {let n=0;for(const c of ref.match(/^[A-Z]+/)[0]) n=n*26+c.charCodeAt(0)-64;return n-1;}
-export async function parseExcel(file,canonical) {
+export async function parseExcel(file,canonical,{allowOther=false}={}) {
   if(!/\.xlsx$/i.test(file.name))throw Error('Valitse Excel-tiedosto (.xlsx).');
   if(file.size>10000000)throw Error('Tiedosto on liian suuri (enintään 10 Mt).');
   if(!window.JSZip)throw Error('Excelin lukija puuttuu. Tarkista sovelluksen tiedostot.');
@@ -35,9 +36,15 @@ export async function parseExcel(file,canonical) {
       values[column(c.getAttribute('r'))]=value;
     }return values;
   });
-  const header=rows.find(r=>canonical.some(m=>m.name.toLocaleLowerCase('fi')===String(r[0]??'').trim().toLocaleLowerCase('fi'))&&r.slice(1).some(x=>/^\d{4}$/.test(String(x))));
-  if(!header)throw Error('Pohjois-Karjalan kuntaa ja vuosiriviä ei tunnistettu.');
-  const ref=canonical.find(m=>m.name.toLocaleLowerCase('fi')===header[0].trim().toLocaleLowerCase('fi'));
+  return municipalityFromRows(rows,file.name,canonical,{allowOther});
+}
+export function municipalityFromRows(rows,fileName,canonical,{allowOther=false}={}){
+  const normalize=s=>String(s??'').trim().toLocaleLowerCase('fi');
+  const headers=rows.filter(r=>{const values=r.slice(1).filter(v=>v!==''&&v!=null);return String(r[0]??'').trim()&&![...canonical[0].sectors,'Päästöhyvitykset','kokonaispäästöt, ktCO2e','per asukas, tCO2e','asukasluku',METHOD].includes(String(r[0]).trim())&&values.length>=2&&values.every(x=>/^\d{4}$/.test(String(x)))&&(allowOther||canonical.some(m=>normalize(m.name)===normalize(r[0])));});
+  if(headers.length!==1)throw Error(allowOther?'Kunnan nimeä ja yksiselitteistä vuosiriviä ei tunnistettu KHK-päästöt-välilehdeltä.':'Pohjois-Karjalan kuntaa ja vuosiriviä ei tunnistettu. Käytä muulle kunnalle Muu kunta -valintaa.');
+  const header=headers[0],name=String(header[0]).trim();
+  if(name.length>120)throw Error('Excelin kunnan nimi on liian pitkä.');
+  const ref=allowOther?{...canonical[0],id:OTHER_ID,name}:canonical.find(m=>normalize(m.name)===normalize(name));
   const cols=header.map((v,i)=>({year:Number(v),col:i})).filter(x=>x.col>0&&header[x.col]!==''&&header[x.col]!=null);
   const methodRows=rows.map(r=>String(r[0]??'').trim()).filter(t=>t.startsWith('Hinku-laskenta'));
   if(methodRows.length!==1||methodRows[0]!==METHOD)throw Error('Valitse lähdepalvelussa ”Hinku-laskenta ilman hyvityksiä”. Muiden menetelmien aineistoa ei yhdistetä tähän aikasarjaan.');
@@ -53,9 +60,9 @@ export async function parseExcel(file,canonical) {
   for(const {year,col} of cols){
     observations[year]={sectors:Object.fromEntries(ref.sectors.map(s=>[s,number(s,col)])),total:number('kokonaispäästöt, ktCO2e',col),credits:number('Päästöhyvitykset',col),perCapita:number('per asukas, tCO2e',col,false),population:number('asukasluku',col,false)};
   }
-  const date=file.name.match(/(\d{4}-\d{2}-\d{2})/);
-  const m={id:ref.id,name:ref.name,sectors:[...ref.sectors],years:cols.map(x=>x.year),observations,metadata:{source:ref.metadata.source,url:ref.metadata.url,method:METHOD,unit:'kt CO₂e',fileName:file.name,downloadDate:date?.[1]??null,publicationDate:null,importedAt:new Date().toISOString().slice(0,10)}};
-  validateMunicipality(m,canonical.map(m=>m.id));return m;
+  const date=fileName.match(/(\d{4}-\d{2}-\d{2})/);
+  const m={id:ref.id,name:ref.name,sectors:[...ref.sectors],years:cols.map(x=>x.year),observations,metadata:{source:ref.metadata.source,url:ref.metadata.url,...(allowOther?{importedMunicipalityName:name}:{}),method:METHOD,unit:'kt CO₂e',fileName,downloadDate:date?.[1]??null,publicationDate:null,importedAt:new Date().toISOString().slice(0,10)}};
+  validateMunicipality(m,allowOther?[OTHER_ID]:canonical.map(m=>m.id));return m;
 }
 export function compareImport(old,next,c) {
   const overlap=next.years.filter(y=>old.observations[y]);

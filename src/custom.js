@@ -22,6 +22,10 @@ export function importSnapshot(data,ids){return {kind:'import',label:'Päästöa
 export function customSnapshot(data){return {kind:'custom',label:'Oman kunnan päästötietojen lisäys',municipality:clone(data.otherMunicipality??null),config:clone(data.otherConfig??null)};}
 export function undoAddition(data,entry){
  if(entry.kind==='import')for(const m of entry.municipalities){const i=data.municipalities.findIndex(x=>x.id===m.id);if(i<0)throw Error('Kumottavaa kuntaa ei löydy.');data.municipalities[i]=clone(m);}
+ else if(entry.kind==='custom-import'){
+  data.otherMunicipality=clone(entry.municipality);
+  if(entry.replaceConfig||!entry.municipality)data.otherConfig=clone(entry.config);
+ }
  else if(entry.kind==='custom'){
   const name=data.otherMunicipality?.name;
   data.otherMunicipality=clone(entry.municipality);
@@ -29,4 +33,18 @@ export function undoAddition(data,entry){
   if(!entry.municipality)data.otherConfig=null;
   // Existing target settings survive a subsequent data import and its undo.
  }else throw Error('Kumottavaa lisäystä ei tunnistettu.');
+}
+
+export function sameCustomMunicipality(old,next){
+ const normalize=x=>String(x??'').trim().toLocaleLowerCase('fi');
+ return !!old&&normalize(old.metadata.importedMunicipalityName??old.name)===normalize(next.metadata.importedMunicipalityName??next.name);
+}
+export function acceptCustomExcel(data,municipality,newConfig,canonical){
+ const same=sameCustomMunicipality(data.otherMunicipality,municipality);
+ if(same&&data.otherMunicipality.years.some(y=>!municipality.years.includes(y)))throw Error('Uudesta aineistosta puuttuu aiempia tietovuosia.');
+ const next=clone(data),undo={kind:'custom-import',label:'Oman kunnan Excel-tuonti: '+municipality.name,municipality:clone(data.otherMunicipality??null),config:clone(data.otherConfig??null),replaceConfig:!same};
+ next.otherMunicipality=clone(municipality);
+ next.otherConfig=same?clone(data.otherConfig):clone(newConfig);
+ validateData(next,canonical);
+ return {data:next,undo};
 }
