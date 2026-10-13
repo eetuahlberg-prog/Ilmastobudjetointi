@@ -1,156 +1,79 @@
-# Ilmastobudjetti
+# Sopeutumisen työkalut
 
-Ilmastobudjetti on Pohjois-Karjalan maakuntaliiton selainpohjainen työkalu kuntien päästökehityksen seurantaan ja talousarvion valmisteluun. Se muodostaa lineaarisen päästöbudjetin, sektorikohtaisen tarkastelun ja tulostettavan raportin. Korjausversio 1.1.
+**Sopeutumisen työkalut** on Pohjois-Karjalan maakuntaliiton Ilmastovisio-hankkeessa toteutettu verkkosivusto kuntien ja yritysten ilmastonmuutokseen sopeutumisen tueksi. Yhteiseltä aloitussivulta pääsee kahteen itsenäiseen arviointi- ja suunnittelutyökaluun.
 
-Mukana ovat Pohjois-Karjalan 13 kunnan päästötiedot ja niistä laskettu maakuntanäkymä. **Muu kunta** mahdollistaa käytön muualla Suomessa käyttäjän omilla lähtötiedoilla. Työkalu tukee Hinku-laskentaa ilman päästöhyvityksiä. Se ei ole päästöennuste eikä virallinen hyväksymismenettely.
+> Työkalut auttavat kuntia ja yrityksiä tunnistamaan omaan toimintaansa vaikuttavia ilmastoriskejä ja löytämään käytännön toimenpiteitä niihin varautumiseksi.
 
-## Näkymät ja ominaisuudet
+## Sisältö
 
-Kolme varsinaista näkymää ovat:
+| Työkalu | Käyttötarkoitus | Osoite sivustolla |
+| --- | --- | --- |
+| **Kunnille** | Kunnan sopeutumistarpeiden kartoittaminen ja tilanteeseen sopivien toimenpiteiden kokoaminen suunnitelmaksi. Toimenpidepohja perustuu Pohjois-Karjalan ilmastonmuutokseen sopeutumisen tiekarttaan ja seutukuntaliitteeseen (2025). | [`/kunta/`](kunta/) |
+| **Yrityksille** | Yrityksen sää- ja ilmastoriippuvuuksien, liiketoimintaan vaikuttavien riskien ja nykyisen varautumisen arviointi sekä ensitoimien kokoaminen toimintalistaksi. | [`/yritys/`](yritys/) |
 
-1. **Yhteenveto:** päästökehitys, tavoiteura, tunnusluvut ja viimeisimmän toteuman tilanne.
-2. **Päästöbudjetti:** sektorikohtaiset toteumat, muutokset ja päästöbudjetit. Sektorin nimestä avautuu oma diagrammi.
-3. **Raportti:** valitun alueen ja talousarviovuoden tulostettava kokonaisuus.
+Kuntien työkalusta voi viedä suunnitelman teksti- tai CSV-tiedostona ja tulostaa sen PDF:ksi. Yritystyökalusta voi tallentaa toimintalistan Excel-, teksti- tai PDF-muodossa. Molemmissa työkaluissa on esimerkkitilanne kokeilua varten. Yritystyökalun versio on **1.2**, ja sen toimialavalinnan ehdotukset voidaan päivittää vaihtamalla toimialaa tai palauttamalla oletusehdotukset.
 
-**Asetukset ja aineisto** sisältää tavoiteasetukset, päästötietojen päivittämisen ja varmuuskopioinnin. Tavoitteet voidaan määritellä yhteisellä vähennysprosentilla tai sektoreittain. Taulukot voi ladata Excel- ja CSV-tiedostoina, diagrammit PNG-kuvina ja näkymät tulostaa selaimesta PDF-tiedostoksi.
+## Käyttö ja tietojen käsittely
 
-Tässä toteutuksessa ei ole toimenpiteiden, vastuutahojen tai kustannusten kirjauslomaketta. Vanhojen varmuuskopioiden `actions`-kenttä säilytetään yhteensopivuuden vuoksi.
+Sivusto toimii selaimessa ilman kirjautumista. Käyttäjän vastauksia ei lähetetä palvelimelle tai tallenneta tietokantaan. Arvion tiedot säilyvät vain kyseisen työkalun avoimessa selainistunnossa: sivun sulkeminen, päivittäminen tai paluu aloitussivulle hävittää keskeneräiset tiedot. Suunnitelma tai toimintalista kannattaa siis tallentaa ennen poistumista.
 
-## Ilmastobudjetin laatiminen
+Työkalut tukevat alustavaa arviointia ja toimenpiteiden valmistelua. Ne eivät korvaa yksityiskohtaista, kohdekohtaista ilmastoriskien selvitystä tai asiantuntija-arviota.
 
-1. Valitse **maakunta tai kunta** ja **talousarviovuosi** työkalun alusta.
-2. Valitse kunnan **Asetukset ja aineisto**. Tarkista lähtövuosi, tavoitevuosi, vähennysprosentti ja tarvittaessa sektorikohtaiset tavoitteet. Pohjois-Karjalan kuntien tekninen aloitusasetus on 2007–2030 ja 65 %. Se ei ole väite kunnan päätetystä tavoitteesta.
-3. Tarkista päästöaineisto. Pohjois-Karjalan kuntien tiedot ovat mukana. Niitä voi päivittää Syken ALas-Excelistä. Muun kunnan tiedot annetaan erikseen jäljempänä kuvatulla tavalla.
-4. Merkitse tavoitteet tarkistetuiksi asetuksissa. Merkintä poistaa tarkistamattomista asetuksista kertovan huomautuksen, mutta ei tarkoita poliittista hyväksyntää.
-5. Tarkista **Yhteenveto** ja **Päästöbudjetti**. Liikennevalot vertaavat viimeisimmän toteumavuoden lukuja saman vuoden tavoiteuraan. Valittu talousarviovuosi ohjaa budjettisarakketta, raportin otsikointia ja vientien vuosimerkintää.
-6. Avaa **Raportti** ja valitse **Tulosta / tallenna PDF**. Valitse selaimessa PDF-tallennus, A4 vaaka ja taustagrafiikat. Poista selaimen omat ylä- ja alatunnisteet. Tarkista esikatselun sivutus ennen tallentamista.
-7. Valitse asetuksissa **Lataa päivitetty data**. JSON-varmuuskopio sisältää kaikkien kuntien päästötiedot, tavoitteet ja mahdollisen oman kunnan tiedot.
+## Tekninen rakenne
 
-Muutokset tallentuvat vain tämän selaimen paikalliseen tallennukseen. Ne eivät päivity julkiselle sivustolle. Kuntien tavoitteet säilyvät toisistaan erillisinä. Talousarviovuoden vaihtaminen ei muuta toteumavuotta eikä tee tulevien vuosien budjetista toteumaa.
-
-## Muu kunta
-
-Valitse aluevalikon viimeinen vaihtoehto **Muu kunta** ja lisää haluamasi kunnan **Hinku-laskenta ilman hyvityksiä** -Excel (`.xlsx`) Syken päästöpalvelusta. Tiedoston voi valita painikkeesta tai pudottaa tuontialueelle. Päästölukuja tai kunnan nimeä ei tarvitse syöttää käsin.
-
-Työkalu lukee `KHK-päästöt`-välilehdeltä kunnan nimen, kaikki tietovuodet, 13 sektoria ja kokonaispäästöt. Sama tietojen tarkistus koskee kaikkia kuntia. Aineiston on oltava yksikössä kt CO₂e ja ilman päästöhyvityksiä. Virheellinen tai puutteellinen tiedosto ei muuta tallennettua aineistoa.
-
-Tuonnin esikatselu näyttää kunnan, aikavälin, sektorien määrän ja viimeisimmät kokonaispäästöt. Ensimmäisellä tuonnilla valitse lähtövuosi ja anna kunnan tavoitevuosi sekä vähennysprosentti. Excel sisältää toteumat, joten kunnan tavoitetta ei päätellä tiedostosta. Hyväksy painikkeella **Ota Excel-aineisto käyttöön**. Tavoitteita voi muuttaa myöhemmin asetuksista.
-
-Saman kunnan uusi Excel tuodaan **Asetukset ja aineisto** -näkymässä. Koko aikasarja päivittyy hyväksymisen jälkeen. Aiemmat tavoiteasetukset ja tavoiteuran tallennettu lähtötaso säilyvät. Aiempia tietovuosia ei saa puuttua uudesta tiedostosta. Lähtötason voi tarvittaessa päivittää erikseen asetuksissa.
-
-Työkalussa on yksi oman kunnan tietopaikka. Jos Excel koskee eri kuntaa, esikatselu kertoo aiemman kunnan tietojen korvaamisesta ja pyytää uuden kunnan tavoitteet. Vaihto tapahtuu vasta **Korvaa oma kunta tällä aineistolla** -painikkeesta. Sen voi kumota, jolloin edellinen kunta ja sen tavoitteet palautuvat.
-
-Oman kunnan tiedot tallentuvat selaimeen ja JSON-varmuuskopioon. Niitä ei liitetä Pohjois-Karjalan maakunnan summaan. Myös edellisessä versiossa käsin syötetyt tiedot voidaan avata ja päivittää Excelistä. Excelistä luettu alkuperäinen kuntanimi säilytetään päivitysten tunnistamista varten, vaikka raportissa näkyvää nimeä muokataan.
-
-## Kumoa viimeisin lisäys
-
-Painike peruu viimeisimmän hyväksytyn päästötietojen lisäyksen:
-
-- Pohjois-Karjalan kunnan tai usean kunnan Excel-tuonnin;
-- oman kunnan ensimmäisen Excel-tuonnin;
-- saman kunnan Excel-päivityksen tai vaihtamisen toiseen kuntaan.
-
-Painikkeen vieressä kerrotaan, mitä on kumottavissa. Vahvistuksen jälkeen aiemmat päästötiedot palautuvat ja laskelmat päivittyvät. Excel-erän kumoaminen koskee vain kyseisessä erässä tuotuja kuntia. Erikseen tehdyt tavoiteasetusten muutokset säilyvät. Oman kunnan ensimmäisen tuonnin kumoaminen poistaa sen tiedot ja tavoitteet. Eri kuntaan vaihtamisen kumoaminen palauttaa edellisen kunnan tiedot ja tavoitteet. Saman kunnan päivityksen kumoaminen säilyttää erikseen tehdyt tavoitemuutokset.
-
-Muistissa on yksi kumottava lisäys. Sen tiedot säilyvät tässä selaimessa myös sivun latauksen yli. Kumoamisen jälkeen painike poistuu käytöstä. Varmuuskopion palauttaminen ja julkaistun aineiston käyttöönotto tyhjentävät kumoamismuistin; ne ovat koko aineiston vaihtoja, eivät tämän painikkeen kumottavia lisäyksiä. JSON-varmuuskopio ei sisällä kumoamishistoriaa.
-
-## Laskentaperiaatteet
-
-Automaattisessa tilassa päästöbudjetti lähtövuoden ja tavoitevuoden välillä on:
+Sivusto on toteutettu tavallisilla HTML-, CSS- ja JavaScript-tiedostoilla. Erillistä sovelluspalvelinta, tietokantaa, kirjautumispalvelua tai ohjelmiston käännösvaihetta ei tarvita. Molemmat työkalut toimivat saman verkkotunnuksen alihakemistoissa ja käyttävät omia ohjelma- ja aineistotiedostojaan.
 
 ```text
-budjetti(vuosi) = lähtötaso × [1 − (vähennysprosentti / 100)
-                             × (vuosi − lähtövuosi) / (tavoitevuosi − lähtövuosi)]
+index.html                    Yhteinen aloitussivu
+style.css                     Aloitussivun ulkoasu
+assets/                       Aloitussivun kuvat ja logot
+kunta/                        Kuntien työkalu (HTML, CSS, JS, aineisto)
+yritys/                       Yritysten työkalu (HTML, CSS, JS, aineisto, Excel-vienti)
+shared/tool-header.css         Molempien työkalujen yhteinen ylätunniste ja huomautustyylit
+shared/typography.css          Molempien työkalujen yhteiset fonttikoot
+yritys/theme.css               Yritysten vihreä väriteema
+yritys/research/              Yritystyökalun lähdeaineisto ja testit
+GITHUB-JULKAISUOHJE.md        GitHub Pages -julkaisuohje
+TESTAUS.txt                   Julkaisun jälkeinen tarkistuslista
+.nojekyll                     GitHub Pages -asetustiedosto
 ```
 
-Tavoitejakson ulkopuolelle ei ekstrapoloida arvoja. Lähtötaso tallennetaan erikseen, joten uusi päästöaineisto ei itsestään siirrä aiemmin määriteltyä tavoiteuraa. Asetuksista voi päivittää lähtötason tietoisesti.
+Aloitussivun ulkoasussa käytetään Pohjois-Karjalan, Ilmastovision ja Euroopan unionin tunnuksia sekä metsätaustakuvaa. Työkalujen yläpalkit jakavat saman HTML-rakenteen ja `shared/tool-header.css`-tyylitiedoston. Sivuston käyttöliittymä on suomenkielinen.
 
-Automaattisessa tilassa kaikilla sektoreilla on sama suhteellinen vähennys. Sektorikohtaisessa tilassa jokainen sektori käyttää omaa vähennystavoitettaan; puuttuva sektorikohtainen prosentti käyttää yleistä tavoitetta. Kokonaistulos summataan sektoreista. Sektorien yhteenlaskettua tavoitetta ei pakoteta vastaamaan yleistä tavoitetta: niiden ero näytetään asetuksissa.
+## Julkaisu ja ylläpito
 
-Lähteen kokonaispäästöt säilytetään. Kokonaispäästöjen ja sektorisumman pyöristysero kulkee laskennassa erillisenä erotuksena ja pienenee yleisellä vähennysprosentilla. Se ei ole päästösektori. Laskennan välituloksia ei pyöristetä.
+Sivusto julkaistaan **yhtenä GitHub Pages -sivustona**. Julkaisun vaiheet on kuvattu tiedostossa **[GITHUB-JULKAISUOHJE.md](GITHUB-JULKAISUOHJE.md)**. Julkaisun toimivuuden tarkistamiseen on erillinen **[TESTAUS.txt](TESTAUS.txt)**.
 
-Maakunnan toteumat ovat 13 kunnan summa. Mukaan otetaan vain vuodet, joilta kaikilla kunnilla on tiedot. Maakunnan tavoiteura on kuntien omien tavoiteurien summa niiden yhteiseltä tavoitejaksolta. Oman kunnan tietopaikka ei vaikuta maakuntaan.
+Aloitussivun sisältöä muokataan juurihakemiston `index.html`- ja `style.css`-tiedostoissa. Kuntien ja yritysten työkaluja päivitetään niiden omissa `kunta/`- ja `yritys/`-hakemistoissa. Tiedostonimet ovat osin samoja, mutta työkalujen ohjelmakoodi ja aineistot eivät ole keskenään vaihdettavia. Päivityksissä on säilytettävä myös työkalujen paluulinkit yhteiselle aloitussivulle. Yhteisen ylätunnisteen tyyliä muokataan `shared/tool-header.css`-tiedostossa.
 
-### Liikennevalot
+Yritystyökalun arviointimenetelmää, tietolähteitä ja rajauksia käsitellään tarkemmin dokumentissa **[Lähteet ja rakenne](yritys/research/LAHTEET-JA-RAKENNE.md)**.
 
-Kaikki päästöjen ja tavoiteurien vertailut käyttävät funktiota `traffic()` tiedostossa `src/additions.js`. Positiiviselle tavoitearvolle suhteellinen ylitys on `(toteuma − tavoiteura) / tavoiteura × 100`.
+## Toteutus ja rahoitus
 
-| Tila | Ehto |
-| --- | --- |
-| Vihreä – Tavoiteuralla | Toteuma on tavoiteuralla tai sen alapuolella. |
-| Keltainen – Lähellä tavoiteuraa | Toteuma ylittää tavoiteuran enintään 5 %. |
-| Punainen – Tavoiteuran yläpuolella | Ylitys on yli 5 %. |
-| Harmaa – Vertailua ei saatavilla | Vertailutieto puuttuu tai on kelpaamaton. |
+Sivusto on toteutettu Pohjois-Karjalan maakuntaliiton **Ilmastovisio – Uutta kasvua ilmastotyöllä Pohjois-Karjalaan** -hankkeessa. Hanketta rahoitetaan Euroopan unionin oikeudenmukaisen siirtymän rahastosta (JTF).
 
-Kun tavoite on nolla, nollatoteuma on vihreä ja positiivinen toteuma punainen. Nollalla ei jaeta. Tasan 5 % on keltainen. Värin määritys käyttää tarkkoja lukuja, ei pyöristettyä näyttötekstiä. Sektoritaulukko, sektori-ikkuna, raportti, yleinen yhteenveto ja sektoritavoitteiden arviointi käyttävät samaa luokittelua. Palloissa on valkoinen reuna ja tuloksen yhteydessä sanallinen tila. Excelin sektoritaulukkoon viedään sanallinen luokitus.
+## Vastuunrajaus
 
-## Lähtöaineisto
+Työkalu on tarkoitettu alustavan arvioinnin ja suunnittelun tueksi. Sisältö ja toimenpide-ehdotukset voivat sisältää virheitä tai puutteita, eivätkä ne korvaa asiantuntija-arviota. Käyttäjän tulee tarkistaa tietojen ajantasaisuus ja ehdotusten soveltuvuus ennen päätöksentekoa. Pohjois-Karjalan maakuntaliitto ei vastaa työkalun käyttöön perustuvien päätösten seurauksista lain sallimissa rajoissa.
 
-Mukana ovat Heinävesi, Ilomantsi, Joensuu, Juuka, Kitee, Kontiolahti, Lieksa, Liperi, Nurmes, Outokumpu, Polvijärvi, Rääkkylä ja Tohmajärvi. Toimitusaineistossa on 21 havaintovuotta: 1990 ja 2005–2024. Puuttuvia vuosia ei täytetä laskennallisesti.
+## Ulkoasu ja typografia
 
-Lähde on Suomen ympäristökeskuksen [kuntien ja alueiden päästöpalvelu](https://paastot.hiilineutraalisuomi.fi/), käyttäjän toimittamat ALas-Excelit. Tiedostonimien latauspäivä on 15.9.2026, eikä sitä tulkita aineiston julkaisupäiväksi. Menetelmä on **Hinku-laskenta ilman päästöhyvityksiä**. Hyvitysrivin nolla ei tarkoita, ettei toisessa laskentamenetelmässä voisi olla hyvityksiä. Hyvityksiä sisältävää laskentaa ei tueta tässä versiossa.
+Kaikilla kolmella sivulla on ensisijaisena fonttina **Corbel**. Sitä käytetään
+käyttäjän laitteelta; Corbel-fonttitiedostoja ei jaella sivuston mukana. Jos
+fonttia ei ole asennettu, selain käyttää Segoe UI-, Arial- tai muuta
+järjestelmäfonttia. Kuntien ja yritysten työkalut käyttävät samaa
+`shared/typography.css`-tiedostossa määriteltyä typografista asteikkoa
+(leipäteksti, pääotsikot, väliotsikot, kysymystekstit ja valikot).
 
-Excel-tuonti lukee `KHK-päästöt`-välilehden: kunnan, vuodet, 13 päästösektoria, kokonaispäästöt, hyvitysrivin sekä mahdolliset asukas- ja asukaskohtaiset tiedot. Se tunnistaa rivit nimillä. Väärä laskentamenetelmä, puuttuvat arvot, päästötaulukon kaavat, ristiriitaiset summat ja puuttuvat vanhat vuodet estävät tuonnin hyväksymisen. Tuonti näyttää vertailun ennen tallennusta.
+- Kuntien työkalun pääväri: Pohjois-Karjalan punainen `#E4003A`.
+- Yritysten työkalun pääväri: vihreä `#ADB150`, RGB 173, 177, 80;
+  annettu painovärimääritys CMYK 40/20/80/0 ja PMS 618 C. Näyttökäytössä
+  käytetään nimenomaan annettua RGB/HEX-arvoa.
+- Yritystyökalun pienissä teksteissä ja aktiivisissa valinnoissa käytetään
+  tummempaa vihreää, jotta tekstin ja käyttöliittymäelementtien kontrasti
+  säilyy. Yläpalkkien mitat ovat samat molemmissa työkaluissa.
 
-`data/source-audit.json` on alkuperäisten Excelien tarkastusraportti. Se ei päivity selaimen tietotuonnissa. Käyttäjä vastaa oikean kunnan ja laskentamenetelmän valitsemisesta lähdepalvelussa.
-
-## Tekninen toteutus
-
-Sovellus käyttää HTML:ää, CSS:ää ja JavaScript-moduuleja. Erillistä palvelinlogiikkaa, tietokantaa, kirjautumista tai käännösvaihetta ei tarvita. JSON-aineiston ja moduulien lataaminen edellyttää HTTP-palvelinta; `index.html`-tiedoston kaksoisnapsautus ei riitä.
-
-| Tiedosto tai kansio | Tehtävä |
-| --- | --- |
-| `index.html` | Aloitussivu, tunnukset, alue- ja vuosivalinta, ohje, navigointi ja alatunniste |
-| `assets/styles.css` | Ulkoasu, mobiili- ja tulostustyylit |
-| `assets/*.png` | Pohjois-Karjalan, Ilmastovision ja EU:n tunnukset |
-| `src/app.js` | Käyttöliittymä, raportti, syöttölomakkeet, selaintallennus ja tapahtumat |
-| `src/core.js` | Alkuperäiset kuntalaskennat, perusvalidointi ja CSV |
-| `src/additions.js` | Maakunnan summat, yhteinen liikennevaloluokittelu ja sektorivärit |
-| `src/custom.js` | Oman kunnan tietojen validointi, Excel-tuonnin hyväksyntä ja kumoaminen |
-| `src/importer.js` | ALas-Excelin lukeminen ja tuontivertailu |
-| `src/exports.js` | Excel- ja PNG-viennit |
-| `vendor/` | Paikallinen JSZip-kirjasto ja sen lisenssi |
-| `data/dataset.json` | Julkaistut päästötiedot, tavoitteet ja yhteensopivuuskentät |
-| `data/source-audit.json` | Alkuperäisen lähdeaineiston tarkastus |
-| `scripts/serve.mjs` | Paikallinen esikatselupalvelin |
-| `scripts/convert_sources.py` | Alkuperäisten Excelien muunnos ylläpitoa varten |
-| `tests/` | Laskennan, validoinnin ja käyttöliittymälogiikan testit |
-| `TESTAUS.md` | Testauksen tulokset ja rajaukset |
-
-`dataset.json` käyttää alkuperäistä `schemaVersion: 1` -rakennetta: `municipalities`, `configs`, `actions` ja `publishedRevision`. Valinnaiset `otherMunicipality` ja `otherConfig` tallentavat oman kunnan erillään alkuperäisistä kunnista. Vanhan version varmuuskopio ilman näitä kenttiä hyväksytään. Oman kunnan sisältävä varmuuskopio kannattaa avata tällä korjausversiolla.
-
-Paikallisen tallennuksen avain säilyy muodossa `pk-ilmastobudjetti-v1`, joten olemassa olevat selaintiedot voidaan lukea. Tallennus sisältää myös valitun talousarviovuoden ja viimeisimmän kumottavan lisäyksen. Avaus näyttää maakuntanäkymän.
-
-Ulkoasussa käytetään brändikirjan punaista `#E4003A`, alkuperäisiä kuvamuotoisia tunnuksia sekä Ubuntu-kirjasinperhettä. Ubuntu haetaan Google Fontsista, jos yhteys sallii sen; varalla on Arial. Maksullisia otsikkofontteja ei sisälly pakettiin. Ilmastovisio-logo on läpinäkyvä PNG samasta tunnusaineistosta kuin sopeutumistyökalujen sivustolla. EU-tunnus on valkoinen versio punaisella taustalla. Molemmat hankkeen ja rahoittajan tunnukset näkyvät tulostuksessa.
-
-## Julkaiseminen ja ylläpito
-
-Pura ZIP ja korvaa GitHub-repositorion tiedostot **ilmastobudjetti-kansion sisällöllä**. `index.html` kuuluu repositorion juureen, ja `assets`, `src`, `data` ja `vendor` sen rinnalle. Älä lataa pelkkää ZIP-tiedostoa. Tässä toimituksessa on mukana koko alkuperäinen päästöaineisto, joten myös `data/dataset.json` voidaan korvata, jos omaa päivitettyä aineistoa ei tarvitse säilyttää.
-
-Jo toimivan GitHub Pages -sivuston julkaisuasetukset säilyvät. Odota julkaisun valmistumista ja päivitä sivu tarvittaessa Ctrl+F5:llä. Jos selaimessa on oma aiempi aineisto, se säilyy päivityksestä huolimatta; tarvittaessa valitse asetuksista **Ota julkaistu aineisto käyttöön**.
-
-Normaali päästöaineiston päivitys tehdään selaimen Excel-tuonnilla, tarkistetaan ja viedään **Lataa päivitetty data** -painikkeella. Julkinen aineisto päivitetään korvaamalla `data/dataset.json`. Koko tiedoston sisältö tulee julkisesti luettavaksi.
-
-Laskennan muutokset tehdään `core.js`- ja `additions.js`-moduuleihin, oman kunnan ja kumoamisen muutokset `custom.js`-moduuliin. Aja testit muutosten jälkeen. Alkuperäisaineiston Python-muunnos vaatii openpyxl-kirjaston ja korvaa toimitusaineiston: se ei ole tavallinen vuosipäivitys.
-
-Paikallinen esikatselu projektikansiossa:
-
-```sh
-npm run dev
-```
-
-Avaa `http://localhost:4173`. Vaihtoehto on `python -m http.server 8000`, jolloin osoite on `http://localhost:8000`. Npm-paketteja ei tarvitse asentaa.
-
-Automaattitestit:
-
-```sh
-npm test
-```
-
-Työkalu ei yhdistä usean käyttäjän muokkauksia. Älä muokkaa samaa aineistoa yhtä aikaa eri välilehdissä. Selaintiedot voivat kadota selaimen tyhjennyksessä; säilytä JSON-varmuuskopio erikseen.
-
-## Tekijä ja rahoitus
-
-Pohjois-Karjalan maakuntaliitto · Ilmastovisio – Uutta kasvua ilmastotyöllä Pohjois-Karjalaan.
-
-Työkalun kehittämistä on rahoitettu Euroopan unionin oikeudenmukaisen siirtymän rahastosta (JTF) osana Ilmastovisio – Uutta kasvua ilmastotyöllä Pohjois-Karjalaan -hanketta.
+Yhteiset fonttikoot määritellään tiedostossa `shared/typography.css` ja
+yläpalkkien rakenne `shared/tool-header.css`-tiedostossa. Yritystyökalun
+väriteema on erillisessä `yritys/theme.css`-tiedostossa. Näihin tiedostoihin
+tehdyt muutokset heijastuvat työkaluun sivuston uudelleenjulkaisun jälkeen.

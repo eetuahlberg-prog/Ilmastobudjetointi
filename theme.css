@@ -1,0 +1,67 @@
+/*
+ * Yritysten sopeutumisen vihreä pääväri.
+ * Näyttöväri RGB 173, 177, 80 / #ADB150; CMYK 40,20,80,0; PMS 618 C.
+ * Tummempi lisäsävy on luettavuuden vuoksi: vaalea brändivihreä ei ole
+ * riittävän tumma pienten linkkitekstien väriksi valkoisella pohjalla.
+ */
+:root {
+  --red: #ADB150;            /* alkuperäisen CSS:n käyttämä pääväritoken */
+  --link: #455019;
+  --business-green: #ADB150;
+  --business-green-deep: #455019;
+  --business-green-ink: #20280E;
+  --business-green-tint: #F2F4DE;
+  --suite-header-bg: #ADB150;
+  --suite-header-text: #20280E;
+  --suite-header-divider: rgba(31, 41, 11, .42);
+  --suite-reset-border: #455019;
+  --suite-reset-hover: #F2F4DE;
+}
+/* Vaaleanvihreässä tunnistepalkissa alkuperäiset valkoiset logot
+   saavat tumman taustalaatan. Logon värejä ei muuteta. */
+.masthead .identity > img,
+.masthead .eu {
+  background: #455019;
+  border-radius: 3px;
+  padding: 9px;
+  box-sizing: border-box;
+}
+.masthead .product span { color: var(--suite-header-text); }
+.suite-nav-home { color: var(--business-green-deep); }
+.suite-reset { background: #fff; }
+.suite-reset:hover { background: var(--business-green-tint); }
+/* Painikkeet: vihreä tausta ja tumma teksti täyttävät kontrastivaatimuksen. */
+.primary {
+  background: var(--business-green);
+  border-color: var(--business-green);
+  color: var(--business-green-ink);
+}
+.secondary { color: var(--business-green-ink); }
+.check input { accent-color: var(--business-green-deep); }
+.check:has(input:checked) {
+  background: var(--business-green-tint);
+  border-color: var(--business-green-deep);
+  box-shadow: inset 0 0 0 1px var(--business-green-deep);
+}
+.badge.act {
+  background: var(--business-green-tint);
+  color: var(--business-green-deep);
+  border-color: #7B8643;
+}
+.selected {
+  background: var(--business-green-tint);
+  color: var(--business-green-deep);
+  border-color: var(--business-green-deep);
+}
+.filters button[aria-pressed="true"] {
+  background: var(--business-green-deep);
+  border-color: var(--business-green-deep);
+  color: #fff;
+}
+.meter { color: var(--business-green-deep); }
+.meter::-webkit-progress-value { background: var(--business-green-deep); }
+.meter::-moz-progress-bar { background: var(--business-green-deep); }
+.report-credit img { background: var(--business-green-deep); }
+@media print {
+  .primary, .action { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+}

@@ -1,0 +1,65 @@
+/*
+ * Yhteinen typografia: kuntien ja yritysten sopeutumistyökalut.
+ * Corbel on Windows-järjestelmissä saatava fontti. Sitä ei jaella tiedostoina.
+ * Varafontit säilyttävät työkalun käytettävänä muilla alustoilla.
+ * Värit määritellään erikseen kummankin työkalun teemassa.
+ */
+:root {
+  --suite-font: Corbel, "Segoe UI", Arial, sans-serif;
+  --suite-font-body: 1rem;
+  --suite-font-h1: clamp(1.875rem, 3.1vw, 2.875rem);
+  --suite-font-h2: 1.5625rem;
+  --suite-font-h3: 1.3125rem;
+  --suite-font-card: 1.375rem;
+  --suite-font-question: 1.0625rem;
+  --suite-font-small: .875rem;
+}
+body {
+  font-family: var(--suite-font);
+  font-size: var(--suite-font-body);
+  line-height: 1.5;
+}
+button, input, select, textarea, summary { font-family: inherit; }
+h1, h2, h3 { font-family: inherit; }
+h1 {
+  font-size: var(--suite-font-h1);
+  line-height: 1.1;
+}
+h2 {
+  font-size: var(--suite-font-h2);
+  line-height: 1.25;
+}
+h3 {
+  font-size: var(--suite-font-h3);
+  line-height: 1.3;
+}
+.eyebrow { font-size: .75rem; }
+.intro p { font-size: 1rem; }
+.steps button { font-size: 1rem; }
+.muted, .hint, .help, .qhint,
+.field, .form-label small, .notice,
+.reason, .role, .stats, .mini,
+.question details, .action details, .card details,
+.choices span, .check { font-size: var(--suite-font-small); }
+.qtitle, .question legend { font-size: var(--suite-font-question); }
+.card h3, .action h3, .impact-card h3, .planitem h3 {
+  font-size: var(--suite-font-card);
+}
+.aside h2, .panel.dark h3 { font-size: 1.4375rem; }
+.report h2 { font-size: var(--suite-font-h2); }
+.report h3 { font-size: var(--suite-font-h3); }
+@media (max-width: 900px) {
+  .steps button { font-size: .875rem; }
+}
+@media (max-width: 600px) {
+  .card h3, .action h3, .impact-card h3, .planitem h3 {
+    font-size: 1.3125rem;
+  }
+  .report h2 { font-size: 1.35rem; }
+}
+@media print {
+  body { font-family: var(--suite-font); font-size: 10pt; line-height: 1.3; }
+  #printout h1 { font-size: 25pt; }
+  #printout h2, .report h2 { font-size: 17pt; }
+  #printout h3, .report h3 { font-size: 12pt; }
+}
